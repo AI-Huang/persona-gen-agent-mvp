@@ -1,0 +1,21 @@
+[project]
+name = "persona-agent-mvp"
+version = "0.1.0"
+description = "人格提示词与OpenAI参数生成AI Agent"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.103.1",
+    "openai>=2.31.0",
+    "pydantic>=2.4.2",
+    "python-dotenv>=1.2.2",
+    "python-multipart>=0.0.26",
+    "uvicorn>=0.44.0",
+]
+
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["backend"]
