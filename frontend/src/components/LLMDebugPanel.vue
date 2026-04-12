@@ -18,6 +18,21 @@
       <textarea v-model="systemPrompt" placeholder="输入系统提示词..."></textarea>
     </div>
     
+    <!-- 对话历史 -->
+    <div class="form-group">
+      <label>对话历史：</label>
+      <div class="chat-history">
+        <div 
+          v-for="(message, index) in messages" 
+          :key="index"
+          :class="['message', message.role]"
+        >
+          <div class="message-role">{{ message.role === 'user' ? '用户' : 'LLM' }}：</div>
+          <div class="message-content">{{ message.content }}</div>
+        </div>
+      </div>
+    </div>
+    
     <!-- 用户输入 -->
     <div class="form-group">
       <label>用户输入：</label>
@@ -42,13 +57,7 @@
     <!-- 发送按钮 -->
     <div class="button-group">
       <button @click="sendRequest" :disabled="!userInput.trim()">发送请求</button>
-      <button @click="clearAll">清空</button>
-    </div>
-    
-    <!-- 响应结果 -->
-    <div v-if="response" class="output-section">
-      <h3>LLM 响应：</h3>
-      <div class="output-content">{{ response }}</div>
+      <button @click="clearAll">清空对话</button>
     </div>
   </div>
 </template>
@@ -61,20 +70,82 @@ const systemPrompt = ref('');
 const userInput = ref('');
 const temperature = ref(0.7);
 const topP = ref(0.9);
-const response = ref('');
+const messages = ref([]);
 
 const sendRequest = async () => {
-  // 这里需要实现与后端的交互，发送请求到 OpenAI API
-  // 暂时模拟响应
-  response.value = "这是 LLM 的模拟响应。在实际实现中，这里会显示来自 OpenAI API 的真实响应。";
+  if (!userInput.value.trim()) return;
+  
+  // 添加用户消息到对话历史
+  messages.value.push({
+    role: 'user',
+    content: userInput.value
+  });
+  
+  // 清空用户输入
+  const userMessage = userInput.value;
+  userInput.value = '';
+  
+  // 模拟 LLM 响应
+  setTimeout(() => {
+    messages.value.push({
+      role: 'assistant',
+      content: `这是对"${userMessage}"的模拟响应。在实际实现中，这里会显示来自 OpenAI API 的真实响应。`
+    });
+  }, 1000);
 };
 
 const clearAll = () => {
   systemPrompt.value = '';
   userInput.value = '';
-  response.value = '';
+  messages.value = [];
 };
 </script>
+
+<style scoped>
+.chat-history {
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 10px;
+  min-height: 200px;
+  max-height: 400px;
+  overflow-y: auto;
+  margin-bottom: 10px;
+}
+
+.message {
+  margin-bottom: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  max-width: 80%;
+}
+
+.message.user {
+  background-color: #e3f2fd;
+  align-self: flex-start;
+  margin-left: auto;
+  border-bottom-right-radius: 2px;
+}
+
+.message.assistant {
+  background-color: #f1f1f1;
+  align-self: flex-start;
+  margin-right: auto;
+  border-bottom-left-radius: 2px;
+}
+
+.message-role {
+  font-weight: bold;
+  margin-bottom: 4px;
+  font-size: 12px;
+  color: #666;
+}
+
+.message-content {
+  font-size: 14px;
+  line-height: 1.4;
+}
+</style>
 
 <style scoped>
 .params-container {
