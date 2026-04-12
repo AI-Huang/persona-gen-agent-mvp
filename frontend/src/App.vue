@@ -1,6 +1,12 @@
 <template>
   <div class="container">
-    <h1>人格提示词与OpenAI参数生成工具（MVP版）</h1>
+    <nav class="navbar">
+      <div class="navbar-brand">人格提示词与OpenAI参数生成工具</div>
+      <div class="navbar-buttons">
+        <button class="nav-button active">人格提示词工具</button>
+        <button class="nav-button">LLM上手调试</button>
+      </div>
+    </nav>
     
     <InputPanel @generate-result="handleGenerateResult" />
     <OutputPanel :result="result" />
