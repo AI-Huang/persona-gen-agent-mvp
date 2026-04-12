@@ -2,9 +2,18 @@
 
 核心定位：一款「输入人格需求，输出可直接复制使用」的AI工具——用户只需描述人格类型（如专业药品助手、治愈陪伴、毒舌顾问），Agent自动生成结构化人格提示词（含大五参数/MBTI）、配套OpenAI API参数，且支持一键复制，适配Dify、直接API调用等核心场景，主打"零门槛、高适配、可落地"。
 
+## 核心功能
+
+- **人格模板选择**：提供10个预设人格模板，涵盖专业、医疗、陪伴等多种场景
+- **自然语言解析**：支持用户输入自然语言描述，自动匹配最接近的人格模板
+- **提示词生成**：生成结构化的人格提示词，包含大五人格参数和行为规则
+- **参数匹配**：根据人格模板匹配最佳的OpenAI API参数
+- **场景适配**：支持Dify和OpenAI API两种场景
+- **一键复制**：生成的提示词和参数可直接复制使用
+
 ## 项目结构
 
-```
+```bash
 persona-agent-mvp/
 ├── backend/                # Python后端（FastAPI）
 │   ├── agent/              # Agent核心逻辑
@@ -22,13 +31,17 @@ persona-agent-mvp/
 └── README.md               # 项目说明文档
 ```
 
-## 安装依赖
+### 技术栈
 
-### 后端依赖
+- 后端: Python + FastAPI + Pydantic
+- 前端: Vue3 + Vite
+- 依赖管理: uv（Python） + npm（前端）
 
-```
-openai>=2.31.0
-```
+## Usage
+
+### 安装依赖
+
+`openai>=2.31.0`
 
 ```bash
 # 使用uv安装后端依赖
@@ -36,21 +49,17 @@ cd persona-agent-mvp
 uv sync
 ```
 
-### 前端依赖
-
 ```bash
 # 安装前端依赖
 cd persona-agent-mvp/frontend
 npm install
 ```
 
-## Usage
-
 ### 1. 配置环境变量
 
 在 `backend/.env` 文件中配置OpenAI API密钥：
 
-```
+```bash
 # 后端基础配置
 PORT=8000
 HOST=0.0.0.0
@@ -95,18 +104,3 @@ npm run dev
 - `GET /api/templates` - 获取人格模板列表
 - `POST /api/generate-by-template` - 按模板生成方案
 - `POST /api/generate-by-nl` - 按自然语言生成方案
-
-## 核心功能
-
-- **人格模板选择**：提供10个预设人格模板，涵盖专业、医疗、陪伴等多种场景
-- **自然语言解析**：支持用户输入自然语言描述，自动匹配最接近的人格模板
-- **提示词生成**：生成结构化的人格提示词，包含大五人格参数和行为规则
-- **参数匹配**：根据人格模板匹配最佳的OpenAI API参数
-- **场景适配**：支持Dify和OpenAI API两种场景
-- **一键复制**：生成的提示词和参数可直接复制使用
-
-## 技术栈
-
-- **后端**：Python + FastAPI + Pydantic
-- **前端**：Vue3 + Vite
-- **依赖管理**：uv（Python） + npm（前端）
