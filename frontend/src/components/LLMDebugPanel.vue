@@ -45,11 +45,27 @@
       <div class="params-container">
         <div class="param-item">
           <label>temperature: {{ temperature }}</label>
-          <input type="range" v-model.number="temperature" min="0" max="1" step="0.1">
+          <input type="range" v-model.number="temperature" min="0" max="2" step="0.1">
         </div>
         <div class="param-item">
           <label>top_p: {{ topP }}</label>
           <input type="range" v-model.number="topP" min="0" max="1" step="0.1">
+        </div>
+        <div class="param-item">
+          <label>max_tokens: {{ maxTokens }}</label>
+          <input type="number" v-model.number="maxTokens" min="1" max="4096" step="100">
+        </div>
+        <div class="param-item">
+          <label>frequency_penalty: {{ frequencyPenalty }}</label>
+          <input type="range" v-model.number="frequencyPenalty" min="-2" max="2" step="0.1">
+        </div>
+        <div class="param-item">
+          <label>presence_penalty: {{ presencePenalty }}</label>
+          <input type="range" v-model.number="presencePenalty" min="-2" max="2" step="0.1">
+        </div>
+        <div class="param-item">
+          <label>stop: {{ stop }}</label>
+          <input type="text" v-model="stop" placeholder="输入停止词，用逗号分隔">
         </div>
       </div>
     </div>
@@ -70,6 +86,10 @@ const systemPrompt = ref('');
 const userInput = ref('');
 const temperature = ref(0.7);
 const topP = ref(0.9);
+const maxTokens = ref(1000);
+const frequencyPenalty = ref(0);
+const presencePenalty = ref(0);
+const stop = ref('');
 const messages = ref([]);
 
 const sendRequest = async () => {
@@ -97,6 +117,12 @@ const sendRequest = async () => {
 const clearAll = () => {
   systemPrompt.value = '';
   userInput.value = '';
+  temperature.value = 0.7;
+  topP.value = 0.9;
+  maxTokens.value = 1000;
+  frequencyPenalty.value = 0;
+  presencePenalty.value = 0;
+  stop.value = '';
   messages.value = [];
 };
 </script>
@@ -149,8 +175,9 @@ const clearAll = () => {
 
 <style scoped>
 .params-container {
-  display: flex;
-  gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
   margin-top: 10px;
 }
 
