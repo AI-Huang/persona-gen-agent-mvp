@@ -17,9 +17,10 @@
         <div class="form-group">
           <label>模型：</label>
           <select v-model="newChatBot.model">
-            <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-            <option value="gpt-4">GPT-4</option>
-            <option value="gpt-4o">GPT-4o</option>
+            <option value="gpt-5">GPT-5</option>
+            <option value="gpt-5.1">GPT-5.1</option>
+            <option value="gpt-5.2">GPT-5.2</option>
+            <option value="gpt-5.4">GPT-5.4</option>
           </select>
         </div>
         <button type="submit">创建</button>
@@ -66,11 +67,12 @@
           </div>
           <div class="form-group">
             <label>模型：</label>
-            <select v-model="editingChatBot.model">
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-              <option value="gpt-4">GPT-4</option>
-              <option value="gpt-4o">GPT-4o</option>
-            </select>
+          <select v-model="editingChatBot.model">
+            <option value="gpt-5">GPT-5</option>
+            <option value="gpt-5.1">GPT-5.1</option>
+            <option value="gpt-5.2">GPT-5.2</option>
+            <option value="gpt-5.4">GPT-5.4</option>
+          </select>
           </div>
           <div class="button-group">
             <button type="submit">保存</button>
