@@ -335,9 +335,11 @@ async def delete_chatbot(chatbot_id: str):
         db = next(db_generator)
 
         # 查询 ChatBot
-        chatbot = db.query(ChatBotModel).filter(ChatBotModel.id == chatbot_id).first()
+        chatbot = db.query(ChatBotModel).filter(
+            ChatBotModel.id == chatbot_id).first()
         if not chatbot:
-            raise HTTPException(status_code=404, detail=f"ChatBot {chatbot_id} 不存在")
+            raise HTTPException(status_code=404,
+                                detail=f"ChatBot {chatbot_id} 不存在")
 
         # 删除 ChatBot
         db.delete(chatbot)
@@ -346,10 +348,8 @@ async def delete_chatbot(chatbot_id: str):
         # 从内存中删除实例
         if chatbot_id in chatbot_instances:
             del chatbot_instances[chatbot_id]
-
         return {"code": 200, "message": "删除成功"}
-    except HTTPException:
-        raise
+
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"删除 ChatBot 失败: {str(e)}")
 
