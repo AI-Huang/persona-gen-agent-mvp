@@ -2,95 +2,106 @@
   <div class="panel">
     <h2>LLM 上手调试</h2>
     
-    <!-- LLM 选择 -->
-    <div class="form-group">
-      <label>选择 LLM 模型：</label>
-      <select v-model="selectedModel">
-        <option value="gpt-5">GPT-5</option>
-        <option value="gpt-5.1">GPT-5.1</option>
-        <option value="gpt-5.2">GPT-5.2</option>
-        <option value="gpt-5.4">GPT-5.4</option>
-      </select>
-    </div>
-    
-    <!-- 系统提示词 -->
-    <div class="form-group">
-      <label>系统提示词：</label>
-      <textarea v-model="systemPrompt" placeholder="输入系统提示词..."></textarea>
-    </div>
-    
-    <!-- ChatBot ID 显示 -->
-    <div v-if="chatbotId" class="form-group">
-      <label>ChatBot ID：</label>
-      <div class="chatbot-id">
-        {{ chatbotId }}
-        <button @click="copyChatbotId" class="copy-btn">复制</button>
-      </div>
-    </div>
-    
-    <!-- 对话历史 -->
-    <div class="form-group">
-      <label>对话历史：</label>
-      <div class="chat-history">
-        <div 
-          v-for="(message, index) in messages" 
-          :key="index"
-          :class="['message', message.role]"
-        >
-          <div class="message-role">{{ message.role === 'user' ? '用户' : 'LLM' }}：</div>
-          <div class="message-content">{{ message.content }}</div>
+    <!-- 顶部两个板块：左上为 chatbot 创建，右上为 参数设置 -->
+    <div class="top-section">
+      <!-- 左上：ChatBot 创建 -->
+      <div class="chatbot-create-section">
+        <h3>ChatBot 创建</h3>
+        
+        <!-- LLM 选择 -->
+        <div class="form-group">
+          <label>选择 LLM 模型：</label>
+          <select v-model="selectedModel">
+            <option value="gpt-5">GPT-5</option>
+            <option value="gpt-5.1">GPT-5.1</option>
+            <option value="gpt-5.2">GPT-5.2</option>
+            <option value="gpt-5.4">GPT-5.4</option>
+          </select>
+        </div>
+        
+        <!-- 系统提示词 -->
+        <div class="form-group">
+          <label>系统提示词：</label>
+          <textarea v-model="systemPrompt" placeholder="输入系统提示词..."></textarea>
+        </div>
+        
+        <!-- ChatBot ID 显示 -->
+        <div v-if="chatbotId" class="form-group">
+          <label>ChatBot ID：</label>
+          <div class="chatbot-id">
+            {{ chatbotId }}
+            <button @click="copyChatbotId" class="copy-btn">复制</button>
+          </div>
         </div>
       </div>
-    </div>
-    
-    <!-- 用户输入 -->
-    <div class="form-group">
-      <label>用户输入：</label>
-      <textarea v-model="userInput" placeholder="输入你的问题..."></textarea>
-    </div>
-    
-    <!-- 参数设置 -->
-    <div class="form-group">
-      <label>参数设置：</label>
-      <div class="params-container">
-        <div class="param-item">
-          <label>temperature: {{ temperature }}</label>
-          <input type="range" v-model.number="temperature" min="0" max="2" step="0.1">
-        </div>
-        <div class="param-item">
-          <label>top_p: {{ topP }}</label>
-          <input type="range" v-model.number="topP" min="0" max="1" step="0.1">
-        </div>
-        <div class="param-item">
-          <label>max_tokens: {{ maxTokens }}</label>
-          <input type="number" v-model.number="maxTokens" min="1" max="4096" step="100">
-        </div>
-        <div class="param-item">
-          <label>frequency_penalty: {{ frequencyPenalty }}</label>
-          <input type="range" v-model.number="frequencyPenalty" min="-2" max="2" step="0.1">
-        </div>
-        <div class="param-item">
-          <label>presence_penalty: {{ presencePenalty }}</label>
-          <input type="range" v-model.number="presencePenalty" min="-2" max="2" step="0.1">
-        </div>
-        <div class="param-item">
-          <label>stop: {{ stop }}</label>
-          <input type="text" v-model="stop" placeholder="输入停止词，用逗号分隔">
+      
+      <!-- 右上：参数设置 -->
+      <div class="params-section">
+        <h3>参数设置</h3>
+        <div class="params-container">
+          <div class="param-item">
+            <label>temperature: {{ temperature }}</label>
+            <input type="range" v-model.number="temperature" min="0" max="2" step="0.1">
+          </div>
+          <div class="param-item">
+            <label>top_p: {{ topP }}</label>
+            <input type="range" v-model.number="topP" min="0" max="1" step="0.1">
+          </div>
+          <div class="param-item">
+            <label>max_tokens: {{ maxTokens }}</label>
+            <input type="number" v-model.number="maxTokens" min="1" max="4096" step="100">
+          </div>
+          <div class="param-item">
+            <label>frequency_penalty: {{ frequencyPenalty }}</label>
+            <input type="range" v-model.number="frequencyPenalty" min="-2" max="2" step="0.1">
+          </div>
+          <div class="param-item">
+            <label>presence_penalty: {{ presencePenalty }}</label>
+            <input type="range" v-model.number="presencePenalty" min="-2" max="2" step="0.1">
+          </div>
+          <div class="param-item">
+            <label>stop: {{ stop }}</label>
+            <input type="text" v-model="stop" placeholder="输入停止词，用逗号分隔">
+          </div>
         </div>
       </div>
     </div>
     
-    <!-- 错误提示 -->
-    <div v-if="error" class="error-message">
-      {{ error }}
-    </div>
-    
-    <!-- 发送按钮 -->
-    <div class="button-group">
-      <button @click="sendRequest" :disabled="!userInput.trim() || loading">
-        {{ loading ? '发送中...' : '发送请求' }}
-      </button>
-      <button @click="clearAll" :disabled="loading">清空对话</button>
+    <!-- 下边：对话历史和用户输入 -->
+    <div class="bottom-section">
+      <!-- 对话历史 -->
+      <div class="form-group">
+        <label>对话历史：</label>
+        <div class="chat-history">
+          <div 
+            v-for="(message, index) in messages" 
+            :key="index"
+            :class="['message', message.role]"
+          >
+            <div class="message-role">{{ message.role === 'user' ? '用户' : 'LLM' }}：</div>
+            <div class="message-content">{{ message.content }}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- 用户输入 -->
+      <div class="form-group">
+        <label>用户输入：</label>
+        <textarea v-model="userInput" placeholder="输入你的问题..."></textarea>
+      </div>
+      
+      <!-- 错误提示 -->
+      <div v-if="error" class="error-message">
+        {{ error }}
+      </div>
+      
+      <!-- 发送按钮 -->
+      <div class="button-group">
+        <button @click="sendRequest" :disabled="!userInput.trim() || loading">
+          {{ loading ? '发送中...' : '发送请求' }}
+        </button>
+        <button @click="clearAll" :disabled="loading">清空对话</button>
+      </div>
     </div>
   </div>
 </template>
@@ -211,8 +222,37 @@ const clearAll = () => {
 </script>
 
 <style scoped>
-.chat-history {
+.top-section {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 30px;
+}
+
+.chatbot-create-section {
+  flex: 1;
   background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.params-section {
+  flex: 1;
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.bottom-section {
+  background-color: #f9f9f9;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.chat-history {
+  background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 10px;
@@ -227,6 +267,8 @@ const clearAll = () => {
   padding: 8px 12px;
   border-radius: 8px;
   max-width: 80%;
+  display: flex;
+  flex-direction: column;
 }
 
 .message.user {
@@ -267,7 +309,7 @@ const clearAll = () => {
 .chatbot-id {
   display: flex;
   align-items: center;
-  background-color: #f9f9f9;
+  background-color: #ffffff;
   border: 1px solid #ddd;
   border-radius: 4px;
   padding: 8px 12px;
@@ -291,12 +333,70 @@ const clearAll = () => {
 .copy-btn:hover {
   background-color: #d0d0d0;
 }
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.form-group textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  background-color: #4CAF50;
+  color: white;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
+}
+
+h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+  color: #333;
+  font-size: 16px;
+}
 </style>
 
 <style scoped>
 .params-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 15px;
   margin-top: 10px;
 }
@@ -309,9 +409,19 @@ const clearAll = () => {
   display: block;
   margin-bottom: 5px;
   font-weight: normal;
+  font-size: 14px;
 }
 
 .param-item input[type="range"] {
   width: 100%;
+}
+
+.param-item input[type="number"],
+.param-item input[type="text"] {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
 }
 </style>
