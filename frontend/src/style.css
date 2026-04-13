@@ -16,7 +16,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
-  margin-top: 20px;
+  margin-top: 0;
 }
 
 /* 导航栏样式 */
@@ -26,9 +26,8 @@ body {
   align-items: center;
   background-color: #f8f9fa;
   padding: 15px 20px;
-  border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 
 .navbar-brand {
@@ -88,7 +87,7 @@ body {
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 0 20px;
 }
 
 .panel {

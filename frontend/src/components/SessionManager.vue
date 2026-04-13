@@ -147,6 +147,9 @@ onMounted(() => {
   max-width: 800px;
   margin: 0 auto;
   padding: 20px;
+  height: calc(100vh - 120px); /* 减去导航栏和容器的 padding/margin */
+  overflow: auto;
+  box-sizing: border-box;
 }
 
 h2 {

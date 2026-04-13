@@ -237,8 +237,9 @@ onMounted(() => {
 <style scoped>
 .chat-app {
   display: flex;
-  height: 100vh;
+  height: calc(100vh - 120px); /* 减去导航栏和容器的 padding/margin */
   width: 100%;
+  overflow: hidden;
 }
 
 /* 左侧 ChatBot 列表 */
@@ -248,6 +249,8 @@ onMounted(() => {
   border-right: 1px solid #ddd;
   padding: 20px;
   overflow-y: auto;
+  max-height: calc(100vh - 120px); /* 减去导航栏和容器的 padding/margin */
+  box-sizing: border-box;
 }
 
 .chatbot-sidebar h3 {
@@ -315,8 +318,9 @@ onMounted(() => {
   flex-direction: column;
   background-color: #f9f9f9;
   min-width: 0;
+  max-height: calc(100vh - 120px); /* 减去导航栏和容器的 padding/margin */
+  overflow: hidden;
 }
-
 /* 聊天窗口头部 */
 .chat-header {
   background-color: white;
@@ -370,6 +374,8 @@ onMounted(() => {
   flex: 1;
   padding: 20px;
   overflow-y: auto;
+  max-height: calc(100vh - 260px); /* 减去导航栏、容器的 padding/margin 以及头部和输入区域的高度 */
+  box-sizing: border-box;
 }
 
 .empty-state {

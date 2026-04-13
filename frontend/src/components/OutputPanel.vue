@@ -68,3 +68,13 @@ const copyToClipboard = async (text) => {
   }
 };
 </script>
+
+<style scoped>
+.panel {
+  height: calc(100vh - 120px); /* 减去导航栏和容器的 padding/margin */
+  width: 100%;
+  overflow: auto;
+  padding: 15px;
+  box-sizing: border-box;
+}
+</style>

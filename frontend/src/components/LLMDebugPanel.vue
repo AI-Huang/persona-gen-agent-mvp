@@ -68,38 +68,45 @@
     
     <!-- 下边：对话历史和用户输入 -->
     <div class="bottom-section">
-      <!-- 对话历史 -->
-      <div class="form-group">
-        <label>对话历史：</label>
-        <div class="chat-history">
-          <div 
-            v-for="(message, index) in messages" 
-            :key="index"
-            :class="['message', message.role]"
-          >
-            <div class="message-role">{{ message.role === 'user' ? '用户' : 'LLM' }}：</div>
-            <div class="message-content">{{ message.content }}</div>
+      <!-- 对话历史和用户输入并列布局 -->
+      <div class="history-input-container">
+        <!-- 用户输入 -->
+        <div class="user-input-section">
+          <div class="form-group">
+            <label>用户输入：</label>
+            <textarea v-model="userInput" placeholder="输入你的问题..."></textarea>
+          </div>
+          
+          <!-- 错误提示 -->
+          <div v-if="error" class="error-message">
+            {{ error }}
+          </div>
+          
+          <!-- 发送按钮 -->
+          <div class="button-group">
+            <button @click="sendRequest" :disabled="!userInput.trim() || loading">
+              {{ loading ? '发送中...' : '发送请求' }}
+            </button>
+            <button @click="clearAll" :disabled="loading">清空对话</button>
           </div>
         </div>
-      </div>
-      
-      <!-- 用户输入 -->
-      <div class="form-group">
-        <label>用户输入：</label>
-        <textarea v-model="userInput" placeholder="输入你的问题..."></textarea>
-      </div>
-      
-      <!-- 错误提示 -->
-      <div v-if="error" class="error-message">
-        {{ error }}
-      </div>
-      
-      <!-- 发送按钮 -->
-      <div class="button-group">
-        <button @click="sendRequest" :disabled="!userInput.trim() || loading">
-          {{ loading ? '发送中...' : '发送请求' }}
-        </button>
-        <button @click="clearAll" :disabled="loading">清空对话</button>
+        
+        <!-- 对话历史 -->
+        <div class="chat-history-section">
+          <div class="form-group">
+            <label>对话历史：</label>
+            <div class="chat-history">
+              <div 
+                v-for="(message, index) in messages" 
+                :key="index"
+                :class="['message', message.role]"
+              >
+                <div class="message-role">{{ message.role === 'user' ? '用户' : 'LLM' }}：</div>
+                <div class="message-content">{{ message.content }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -238,16 +245,30 @@ const clearAll = () => {
 </script>
 
 <style scoped>
+/* 确保面板适配上层容器 */
+
+.panel {
+  height: calc(100vh - 120px); /* 减去导航栏和容器的 padding/margin */
+  width: 100%;
+  overflow: hidden;
+  padding: 15px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+}
+
 .top-section {
   display: flex;
-  gap: 20px;
-  margin-bottom: 30px;
+  gap: 15px;
+  margin-bottom: 15px;
+  flex: 0 0 auto;
+  height: 320px;
 }
 
 .chatbot-create-section {
   flex: 1;
   background-color: #f9f9f9;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
@@ -255,16 +276,51 @@ const clearAll = () => {
 .params-section {
   flex: 1;
   background-color: #f9f9f9;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .bottom-section {
   background-color: #f9f9f9;
-  padding: 20px;
+  padding: 15px;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.history-input-container {
+  display: flex;
+  gap: 15px;
+  flex: 1;
+  overflow: hidden;
+}
+
+.user-input-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.chat-history-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-history-section .form-group {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-history-section .chat-history {
+  flex: 1;
+  margin-top: 5px;
 }
 
 .chat-history {
