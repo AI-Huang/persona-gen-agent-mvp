@@ -33,6 +33,13 @@
             <button @click="copyChatbotId" class="copy-btn">复制</button>
           </div>
         </div>
+        
+        <!-- 创建按钮 -->
+        <div v-if="!chatbotId" class="form-group">
+          <button @click="createChatBot" :disabled="loading">
+            {{ loading ? '创建中...' : '创建 ChatBot' }}
+          </button>
+        </div>
       </div>
       
       <!-- 右上：参数设置 -->
