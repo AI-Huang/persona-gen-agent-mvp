@@ -1,13 +1,21 @@
+from datetime import datetime
+
 import openai
 from sqlalchemy.orm import Session
 
 from backend.config.settings import settings
 from backend.database.db import ChatBot as ChatBotModel
-from backend.database.db import Conversation, get_db
+from backend.database.db import Conversation
+from backend.database.db import Session as SessionModel
+from backend.database.db import get_db
 
 
 class ChatBot:
-    def __init__(self, name: str, system_prompt: str, model: str = "gpt-3.5-turbo"):
+
+    def __init__(self,
+                 name: str,
+                 system_prompt: str,
+                 model: str = "gpt-3.5-turbo"):
         """
         初始化 ChatBot
         注意：system 提示词初始化后就不能修改，这是 OpenAI 官方建议的
@@ -34,15 +42,15 @@ class ChatBot:
 
     def _save_to_db(self):
         """保存 ChatBot 到数据库"""
-        chatbot = ChatBotModel(
-            name=self.name, system_prompt=self.system_prompt, model=self.model
-        )
+        chatbot = ChatBotModel(name=self.name,
+                               system_prompt=self.system_prompt,
+                               model=self.model)
         self.db.add(chatbot)
         self.db.commit()
         self.db.refresh(chatbot)
         self.chatbot_id = chatbot.id
 
-    def chat(self, messages, params) -> str:
+    def chat(self, messages, params, session_id=None) -> str:
         """
         与 ChatBot 对话
         1. 发送用户消息到 OpenAI API
@@ -58,9 +66,10 @@ class ChatBot:
                     has_system_prompt = True
                     final_messages.append(message)
             if not has_system_prompt:
-                final_messages.insert(
-                    0, {"role": "system", "content": self.system_prompt}
-                )
+                final_messages.insert(0, {
+                    "role": "system",
+                    "content": self.system_prompt
+                })
 
             # 获取用户消息，用于保存到数据库
             user_message = ""
@@ -71,9 +80,8 @@ class ChatBot:
             # 调用 OpenAI API (OpenAI SDK v1.0+ 格式)
             from openai import OpenAI
 
-            client = OpenAI(
-                api_key=settings.OPENAI_API_KEY, base_url=settings.OPENAI_BASE_URL
-            )
+            client = OpenAI(api_key=settings.OPENAI_API_KEY,
+                            base_url=settings.OPENAI_BASE_URL)
 
             # 构建参数，处理特殊情况
             chat_params = params.model_dump()
@@ -87,42 +95,85 @@ class ChatBot:
             model_response = response.choices[0].message.content
 
             # 保存对话到数据库
-            self._save_conversation(user_message, model_response)
+            self._save_conversation(user_message, model_response, session_id)
 
             return model_response
         except Exception as e:
             print(f"对话失败: {e}")
             raise
 
-    def _save_conversation(self, user_message: str, model_response: str):
+    def _save_conversation(self,
+                           user_message: str,
+                           model_response: str,
+                           session_id=None):
         """保存对话到数据库"""
+        # 如果没有提供 session_id，创建一个新的会话
+        if not session_id:
+            session = SessionModel(
+                chatbot_id=self.chatbot_id,
+                name=f"会话 {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            self.db.add(session)
+            self.db.commit()
+            self.db.refresh(session)
+            session_id = session.id
+
         conversation = Conversation(
             chatbot_id=self.chatbot_id,
+            session_id=session_id,
             user_message=user_message,
             model_response=model_response,
         )
         self.db.add(conversation)
         self.db.commit()
 
-    def get_conversations(self, limit: int = 10) -> list:
-        """获取对话历史"""
-        conversations = (
-            self.db.query(Conversation)
-            .filter(Conversation.chatbot_id == self.chatbot_id)
-            .order_by(Conversation.created_at.desc())
-            .limit(limit)
-            .all()
-        )
+    def create_session(self, name: str) -> str:
+        """创建新会话"""
+        session = SessionModel(chatbot_id=self.chatbot_id, name=name)
+        self.db.add(session)
+        self.db.commit()
+        self.db.refresh(session)
+        return session.id
 
-        return [
-            {
-                "id": conv.id,
-                "user_message": conv.user_message,
-                "model_response": conv.model_response,
-                "created_at": conv.created_at,
-            }
-            for conv in conversations
-        ]
+    def get_sessions(self) -> list:
+        """获取会话列表"""
+        sessions = (self.db.query(SessionModel).filter(
+            SessionModel.chatbot_id == self.chatbot_id).order_by(
+                SessionModel.created_at.desc()).all())
+
+        return [{
+            "id": session.id,
+            "name": session.name,
+            "created_at": session.created_at,
+        } for session in sessions]
+
+    def get_session_conversations(self,
+                                  session_id: str,
+                                  limit: int = 10) -> list:
+        """获取会话的对话历史"""
+        conversations = (self.db.query(Conversation).filter(
+            Conversation.chatbot_id == self.chatbot_id).filter(
+                Conversation.session_id == session_id).order_by(
+                    Conversation.created_at.desc()).limit(limit).all())
+
+        return [{
+            "id": conv.id,
+            "user_message": conv.user_message,
+            "model_response": conv.model_response,
+            "created_at": conv.created_at,
+        } for conv in conversations]
+
+    def get_conversations(self, limit: int = 10) -> list:
+        """获取对话历史（默认获取最近的对话）"""
+        conversations = (self.db.query(Conversation).filter(
+            Conversation.chatbot_id == self.chatbot_id).order_by(
+                Conversation.created_at.desc()).limit(limit).all())
+
+        return [{
+            "id": conv.id,
+            "user_message": conv.user_message,
+            "model_response": conv.model_response,
+            "created_at": conv.created_at,
+        } for conv in conversations]
 
     def close(self):
         """关闭数据库会话"""

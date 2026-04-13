@@ -35,18 +35,34 @@ class ChatBot(Base):
     conversations = relationship("Conversation", back_populates="chatbot")
 
 
-# 会话表 - 存储用户请求和模型响应
+# 会话表 - 存储会话信息
+class Session(Base):
+    __tablename__ = "sessions"
+
+    id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    chatbot_id = Column(String, ForeignKey("chatbots.id"), nullable=False)
+    name = Column(String, nullable=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    # 关系
+    chatbot = relationship("ChatBot", backref="sessions")
+    conversations = relationship("Conversation", back_populates="session")
+
+
+# 会话消息表 - 存储用户请求和模型响应
 class Conversation(Base):
     __tablename__ = "conversations"
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     chatbot_id = Column(String, ForeignKey("chatbots.id"), nullable=False)
+    session_id = Column(String, ForeignKey("sessions.id"), nullable=False)
     user_message = Column(Text, nullable=False)
     model_response = Column(Text, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     # 关系
     chatbot = relationship("ChatBot", back_populates="conversations")
+    session = relationship("Session", back_populates="conversations")
 
 
 # 创建表

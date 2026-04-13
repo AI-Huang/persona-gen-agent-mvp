@@ -33,22 +33,32 @@
       <div v-if="chatbots.length === 0" class="empty-state">
         暂无 ChatBot，请创建一个新的 ChatBot
       </div>
-      <div v-else class="chatbot-list">
-        <div 
-          v-for="chatbot in chatbots" 
-          :key="chatbot.id"
-          class="chatbot-item"
-        >
-          <div class="chatbot-info">
-            <h4>{{ chatbot.name }}</h4>
-            <p>{{ chatbot.systemPrompt }}</p>
-            <p class="model-info">模型：{{ chatbot.model }}</p>
-          </div>
-          <div class="chatbot-actions">
-            <button @click="editChatBot(chatbot)" class="edit-btn">编辑</button>
-            <button @click="deleteChatBot(chatbot.id)" class="delete-btn">删除</button>
-          </div>
-        </div>
+      <div v-else class="chatbot-table">
+        <table>
+          <thead>
+            <tr>
+              <th>完整ID</th>
+              <th>短ID</th>
+              <th>名称</th>
+              <th>系统提示词</th>
+              <th>模型</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="chatbot in chatbots" :key="chatbot.id">
+              <td class="id-column">{{ chatbot.id }}</td>
+              <td class="short-id-column">{{ chatbot.id.substring(0, 8) }}</td>
+              <td class="name-column">{{ chatbot.name }}</td>
+              <td class="system-prompt-column">{{ chatbot.systemPrompt }}</td>
+              <td class="model-column">{{ chatbot.model }}</td>
+              <td class="actions-column">
+                <button @click="editChatBot(chatbot)" class="edit-btn">编辑</button>
+                <button @click="deleteChatBot(chatbot.id)" class="delete-btn">删除</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
     
@@ -232,47 +242,68 @@ button:hover {
   border-radius: 8px;
 }
 
-.chatbot-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.chatbot-table {
+  overflow-x: auto;
 }
 
-.chatbot-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  padding: 15px;
+.chatbot-table table {
+  width: 100%;
+  border-collapse: collapse;
   background-color: #f9f9f9;
   border-radius: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-.chatbot-info {
-  flex: 1;
-  margin-right: 20px;
+.chatbot-table th,
+.chatbot-table td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
 }
 
-.chatbot-info h4 {
-  margin: 0 0 10px 0;
+.chatbot-table th {
+  background-color: #f2f2f2;
+  font-weight: bold;
   color: #333;
 }
 
-.chatbot-info p {
-  margin: 0 0 10px 0;
-  color: #666;
-  line-height: 1.4;
+.chatbot-table tr:hover {
+  background-color: #f5f5f5;
 }
 
-.model-info {
+.chatbot-table .id-column {
+  width: 20%;
+  font-family: monospace;
   font-size: 12px;
-  color: #999;
-  margin-top: 5px;
+  word-break: break-all;
 }
 
-.chatbot-actions {
-  display: flex;
-  gap: 10px;
+.chatbot-table .short-id-column {
+  width: 10%;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+.chatbot-table .name-column {
+  width: 15%;
+}
+
+.chatbot-table .system-prompt-column {
+  width: 30%;
+  word-break: break-word;
+}
+
+.chatbot-table .model-column {
+  width: 10%;
+}
+
+.chatbot-table .actions-column {
+  width: 15%;
+  white-space: nowrap;
+}
+
+.chatbot-table .actions-column button {
+  margin-right: 5px;
 }
 
 .edit-btn {

@@ -24,6 +24,13 @@
         >
           ChatBot 管理
         </button>
+        <button 
+          class="nav-button" 
+          :class="{ active: activePanel === 'session' }"
+          @click="switchPanel('session')"
+        >
+          会话管理
+        </button>
       </div>
     </nav>
     
@@ -42,6 +49,11 @@
     <div v-else-if="activePanel === 'chatbot'">
       <ChatBotManager />
     </div>
+    
+    <!-- 会话管理面板 -->
+    <div v-else-if="activePanel === 'session'">
+      <SessionManager />
+    </div>
   </div>
 </template>
 
@@ -51,6 +63,7 @@ import ChatBotManager from './components/ChatBotManager.vue';
 import InputPanel from './components/InputPanel.vue';
 import LLMDebugPanel from './components/LLMDebugPanel.vue';
 import OutputPanel from './components/OutputPanel.vue';
+import SessionManager from './components/SessionManager.vue';
 
 const activePanel = ref('persona');
 const result = ref(null);
