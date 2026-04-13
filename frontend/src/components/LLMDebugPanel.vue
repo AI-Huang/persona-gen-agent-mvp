@@ -71,18 +71,26 @@
       </div>
     </div>
     
+    <!-- 错误提示 -->
+    <div v-if="error" class="error-message">
+      {{ error }}
+    </div>
+    
     <!-- 发送按钮 -->
     <div class="button-group">
-      <button @click="sendRequest" :disabled="!userInput.trim()">发送请求</button>
-      <button @click="clearAll">清空对话</button>
+      <button @click="sendRequest" :disabled="!userInput.trim() || loading">
+        {{ loading ? '发送中...' : '发送请求' }}
+      </button>
+      <button @click="clearAll" :disabled="loading">清空对话</button>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import { request } from '../utils/request';
 
-const selectedModel = ref('gpt-3.5-turbo');
+const selectedModel = ref('gpt-5');
 const systemPrompt = ref('');
 const userInput = ref('');
 const temperature = ref(0.7);
@@ -92,9 +100,40 @@ const frequencyPenalty = ref(0);
 const presencePenalty = ref(0);
 const stop = ref('');
 const messages = ref([]);
+const loading = ref(false);
+const error = ref('');
+const chatbotId = ref('');
+
+// 创建 ChatBot 实例
+const createChatBot = async () => {
+  try {
+    loading.value = true;
+    error.value = '';
+    
+    const response = await request('/api/chatbot/create', 'POST', {
+      name: 'LLM 调试助手',
+      system_prompt: systemPrompt.value || '你是一个 helpful 的助手',
+      model: selectedModel.value
+    });
+    
+    chatbotId.value = response.data.chatbot_id;
+    console.log('ChatBot 创建成功:', chatbotId.value);
+  } catch (err) {
+    error.value = '创建 ChatBot 失败，请稍后重试';
+    console.error('创建 ChatBot 失败:', err);
+  } finally {
+    loading.value = false;
+  }
+};
 
 const sendRequest = async () => {
   if (!userInput.value.trim()) return;
+  
+  // 如果还没有创建 ChatBot 实例，先创建
+  if (!chatbotId.value) {
+    await createChatBot();
+    if (!chatbotId.value) return; // 创建失败，直接返回
+  }
   
   // 添加用户消息到对话历史
   messages.value.push({
@@ -106,13 +145,33 @@ const sendRequest = async () => {
   const userMessage = userInput.value;
   userInput.value = '';
   
-  // 模拟 LLM 响应
-  setTimeout(() => {
+  try {
+    loading.value = true;
+    error.value = '';
+    
+    // 调用后端 API 与 ChatBot 对话
+    const response = await request('/api/chatbot/chat', 'POST', {
+      chatbot_id: chatbotId.value,
+      message: userMessage
+    });
+    
+    // 添加 LLM 响应到对话历史
     messages.value.push({
       role: 'assistant',
-      content: `这是对"${userMessage}"的模拟响应。在实际实现中，这里会显示来自 OpenAI API 的真实响应。`
+      content: response.data.response
     });
-  }, 1000);
+  } catch (err) {
+    error.value = '对话失败，请稍后重试';
+    console.error('对话失败:', err);
+    
+    // 添加错误消息到对话历史
+    messages.value.push({
+      role: 'assistant',
+      content: '抱歉，对话失败，请稍后重试'
+    });
+  } finally {
+    loading.value = false;
+  }
 };
 
 const clearAll = () => {
@@ -125,6 +184,8 @@ const clearAll = () => {
   presencePenalty.value = 0;
   stop.value = '';
   messages.value = [];
+  chatbotId.value = '';
+  error.value = '';
 };
 </script>
 
@@ -171,6 +232,15 @@ const clearAll = () => {
 .message-content {
   font-size: 14px;
   line-height: 1.4;
+}
+
+.error-message {
+  background-color: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 15px;
+  font-size: 14px;
 }
 </style>
 
