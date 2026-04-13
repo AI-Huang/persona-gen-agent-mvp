@@ -185,14 +185,16 @@ const sendRequest = async () => {
     // 构建请求体，符合 OpenAI Chat Completions API 格式
     const requestBody = {
       chatbot_id: chatbotId.value,
-      model: selectedModel.value,
-      messages: messagesArray,
-      temperature: temperature.value,
-      top_p: topP.value,
-      max_tokens: maxTokens.value,
-      frequency_penalty: frequencyPenalty.value,
-      presence_penalty: presencePenalty.value,
-      stop: stop.value ? stop.value.split(',').map(s => s.trim()) : null
+      params: {
+        model: selectedModel.value,
+        messages: messagesArray,
+        temperature: temperature.value,
+        top_p: topP.value,
+        max_tokens: maxTokens.value,
+        frequency_penalty: frequencyPenalty.value,
+        presence_penalty: presencePenalty.value,
+        stop: stop.value ? stop.value.split(',').map(s => s.trim()) : null
+      }
     };
     
     // 调用后端 API 与 ChatBot 对话

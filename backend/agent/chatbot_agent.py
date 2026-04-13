@@ -61,6 +61,25 @@ class ChatBot:
         tools=None,
         tool_choice=None,
         parallel_tool_calls=True,
+        # 新增参数
+        audio=None,
+        function_call=None,
+        functions=None,
+        logprobs=None,
+        max_completion_tokens=None,
+        metadata=None,
+        modalities=None,
+        prediction=None,
+        prompt_cache_key=None,
+        prompt_cache_retention=None,
+        reasoning_effort=None,
+        safety_identifier=None,
+        service_tier=None,
+        store=None,
+        stream_options=None,
+        top_logprobs=None,
+        verbosity=None,
+        web_search_options=None,
     ) -> str:
         """
         与 ChatBot 对话
@@ -112,6 +131,25 @@ class ChatBot:
                 tools=tools,
                 tool_choice=tool_choice,
                 parallel_tool_calls=parallel_tool_calls,
+                # 新增参数
+                audio=audio,
+                function_call=function_call,
+                functions=functions,
+                logprobs=logprobs,
+                max_completion_tokens=max_completion_tokens,
+                metadata=metadata,
+                modalities=modalities,
+                prediction=prediction,
+                prompt_cache_key=prompt_cache_key,
+                prompt_cache_retention=prompt_cache_retention,
+                reasoning_effort=reasoning_effort,
+                safety_identifier=safety_identifier,
+                service_tier=service_tier,
+                store=store,
+                stream_options=stream_options,
+                top_logprobs=top_logprobs,
+                verbosity=verbosity,
+                web_search_options=web_search_options,
             )
 
             # 获取模型响应

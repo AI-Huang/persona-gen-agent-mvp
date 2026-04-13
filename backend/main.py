@@ -39,6 +39,48 @@ class TemplateInput(BaseModel):
 
 
 # ChatBot 相关输入模型
+class OpenAICompletionCreateParams(BaseModel):
+    """Copy from openai.types.chat.CompletionCreateParams"""
+
+    # 必需参数
+    messages: list
+    model: str
+
+    # 可选参数
+    audio: dict = None
+    frequency_penalty: float = None
+    function_call: dict = None
+    functions: list = None
+    logit_bias: dict = None
+    logprobs: bool = None
+    max_completion_tokens: int = None
+    max_tokens: int = None
+    metadata: dict = None
+    modalities: list = None
+    n: int = None
+    parallel_tool_calls: bool = None
+    prediction: dict = None
+    presence_penalty: float = None
+    prompt_cache_key: str = None
+    prompt_cache_retention: str = None
+    reasoning_effort: str = None
+    response_format: dict = None
+    safety_identifier: str = None
+    seed: int = None
+    service_tier: str = None
+    stop: list = None
+    store: bool = None
+    stream_options: dict = None
+    temperature: float = None
+    tool_choice: dict = None
+    tools: list = None
+    top_logprobs: int = None
+    top_p: float = None
+    user: str = None
+    verbosity: str = None
+    web_search_options: dict = None
+
+
 class ChatBotCreateInput(BaseModel):
     name: str
     system_prompt: str
@@ -47,23 +89,7 @@ class ChatBotCreateInput(BaseModel):
 
 class ChatBotInput(BaseModel):
     chatbot_id: str
-    model: str
-    messages: list
-    temperature: float = 0.7
-    top_p: float = 1.0
-    n: int = 1
-    stream: bool = False
-    stop: list = None
-    max_tokens: int = None
-    frequency_penalty: float = 0.0
-    presence_penalty: float = 0.0
-    logit_bias: dict = None
-    user: str = None
-    response_format: dict = None
-    seed: int = None
-    tools: list = None
-    tool_choice: str = None
-    parallel_tool_calls: bool = True
+    params: OpenAICompletionCreateParams
 
 
 # 路由：获取所有人格模板（供前端下拉选择）
@@ -228,23 +254,42 @@ async def chat_with_chatbot(input: ChatBotInput):
 
         # 进行对话
         response = chatbot.chat(
-            messages=input.messages,
-            model=input.model,
-            temperature=input.temperature,
-            top_p=input.top_p,
-            n=input.n,
-            stream=input.stream,
-            stop=input.stop,
-            max_tokens=input.max_tokens,
-            frequency_penalty=input.frequency_penalty,
-            presence_penalty=input.presence_penalty,
-            logit_bias=input.logit_bias,
-            user=input.user,
-            response_format=input.response_format,
-            seed=input.seed,
-            tools=input.tools,
-            tool_choice=input.tool_choice,
-            parallel_tool_calls=input.parallel_tool_calls,
+            messages=input.params.messages,
+            model=input.params.model,
+            temperature=input.params.temperature,
+            top_p=input.params.top_p,
+            n=input.params.n,
+            stream=input.params.stream,
+            stop=input.params.stop,
+            max_tokens=input.params.max_tokens,
+            frequency_penalty=input.params.frequency_penalty,
+            presence_penalty=input.params.presence_penalty,
+            logit_bias=input.params.logit_bias,
+            user=input.params.user,
+            response_format=input.params.response_format,
+            seed=input.params.seed,
+            tools=input.params.tools,
+            tool_choice=input.params.tool_choice,
+            parallel_tool_calls=input.params.parallel_tool_calls,
+            # 新增参数
+            audio=input.params.audio,
+            function_call=input.params.function_call,
+            functions=input.params.functions,
+            logprobs=input.params.logprobs,
+            max_completion_tokens=input.params.max_completion_tokens,
+            metadata=input.params.metadata,
+            modalities=input.params.modalities,
+            prediction=input.params.prediction,
+            prompt_cache_key=input.params.prompt_cache_key,
+            prompt_cache_retention=input.params.prompt_cache_retention,
+            reasoning_effort=input.params.reasoning_effort,
+            safety_identifier=input.params.safety_identifier,
+            service_tier=input.params.service_tier,
+            store=input.params.store,
+            stream_options=input.params.stream_options,
+            top_logprobs=input.params.top_logprobs,
+            verbosity=input.params.verbosity,
+            web_search_options=input.params.web_search_options,
         )
 
         return {"code": 200, "message": "对话成功", "data": {"response": response}}
