@@ -45,7 +45,7 @@ class ChatBotCreateInput(BaseModel):
     model: str = "gpt-3.5-turbo"
 
 
-class ChatInput(BaseModel):
+class ChatBotInput(BaseModel):
     chatbot_id: str
     model: str
     messages: list
@@ -217,7 +217,7 @@ async def create_chatbot(input: ChatBotCreateInput):
     summary="与 ChatBot 对话",
     description="向指定的 ChatBot 发送消息并获取响应，支持 OpenAI Chat Completions API 的完整参数",
 )
-async def chat_with_chatbot(input: ChatInput):
+async def chat_with_chatbot(input: ChatBotInput):
     try:
         # 获取 ChatBot 实例
         chatbot = chatbot_instances.get(input.chatbot_id)
