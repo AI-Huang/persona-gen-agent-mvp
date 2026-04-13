@@ -176,11 +176,27 @@ const sendRequest = async () => {
     loading.value = true;
     error.value = '';
     
-    // 调用后端 API 与 ChatBot 对话
-    const response = await request('/api/chatbot/chat', 'POST', {
+    // 构建 messages 数组
+    const messagesArray = [
+      { role: 'system', content: systemPrompt.value || '你是一个 helpful 的助手' },
+      { role: 'user', content: userMessage }
+    ];
+    
+    // 构建请求体，符合 OpenAI Chat Completions API 格式
+    const requestBody = {
       chatbot_id: chatbotId.value,
-      message: userMessage
-    });
+      model: selectedModel.value,
+      messages: messagesArray,
+      temperature: temperature.value,
+      top_p: topP.value,
+      max_tokens: maxTokens.value,
+      frequency_penalty: frequencyPenalty.value,
+      presence_penalty: presencePenalty.value,
+      stop: stop.value ? stop.value.split(',').map(s => s.trim()) : null
+    };
+    
+    // 调用后端 API 与 ChatBot 对话
+    const response = await request('/api/chatbot/chat', 'POST', requestBody);
     
     // 添加 LLM 响应到对话历史
     messages.value.push({
