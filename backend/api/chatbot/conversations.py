@@ -1,6 +1,6 @@
 from fastapi import APIRouter, HTTPException
 
-from backend.api.chatbot.chatbot import chatbot_instances
+from backend.api.chatbot.api import chatbot_instances
 
 router = APIRouter()
 
