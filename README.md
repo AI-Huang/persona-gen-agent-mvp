@@ -67,7 +67,7 @@ RELOAD=True
 
 # OpenAI配置（敏感信息，不提交代码）
 OPENAI_API_KEY=your_openai_api_key
-OPENAI_MODEL=gpt-3.5-turbo
+OPENAI_MODEL=gpt-5
 ```
 
 ### 2. 启动后端服务
