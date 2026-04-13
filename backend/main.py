@@ -253,44 +253,7 @@ async def chat_with_chatbot(input: ChatBotInput):
             )
 
         # 进行对话
-        response = chatbot.chat(
-            messages=input.params.messages,
-            model=input.params.model,
-            temperature=input.params.temperature,
-            top_p=input.params.top_p,
-            n=input.params.n,
-            stream=input.params.stream,
-            stop=input.params.stop,
-            max_tokens=input.params.max_tokens,
-            frequency_penalty=input.params.frequency_penalty,
-            presence_penalty=input.params.presence_penalty,
-            logit_bias=input.params.logit_bias,
-            user=input.params.user,
-            response_format=input.params.response_format,
-            seed=input.params.seed,
-            tools=input.params.tools,
-            tool_choice=input.params.tool_choice,
-            parallel_tool_calls=input.params.parallel_tool_calls,
-            # 新增参数
-            audio=input.params.audio,
-            function_call=input.params.function_call,
-            functions=input.params.functions,
-            logprobs=input.params.logprobs,
-            max_completion_tokens=input.params.max_completion_tokens,
-            metadata=input.params.metadata,
-            modalities=input.params.modalities,
-            prediction=input.params.prediction,
-            prompt_cache_key=input.params.prompt_cache_key,
-            prompt_cache_retention=input.params.prompt_cache_retention,
-            reasoning_effort=input.params.reasoning_effort,
-            safety_identifier=input.params.safety_identifier,
-            service_tier=input.params.service_tier,
-            store=input.params.store,
-            stream_options=input.params.stream_options,
-            top_logprobs=input.params.top_logprobs,
-            verbosity=input.params.verbosity,
-            web_search_options=input.params.web_search_options,
-        )
+        response = chatbot.chat(messages=input.params.messages, params=input.params)
 
         return {"code": 200, "message": "对话成功", "data": {"response": response}}
     except HTTPException:
