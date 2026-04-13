@@ -17,6 +17,13 @@
         >
           LLM上手调试
         </button>
+        <button 
+          class="nav-button" 
+          :class="{ active: activePanel === 'chatbot' }"
+          @click="switchPanel('chatbot')"
+        >
+          ChatBot 管理
+        </button>
       </div>
     </nav>
     
@@ -30,11 +37,17 @@
     <div v-else-if="activePanel === 'llm'">
       <LLMDebugPanel />
     </div>
+    
+    <!-- ChatBot 管理面板 -->
+    <div v-else-if="activePanel === 'chatbot'">
+      <ChatBotManager />
+    </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
+import ChatBotManager from './components/ChatBotManager.vue';
 import InputPanel from './components/InputPanel.vue';
 import LLMDebugPanel from './components/LLMDebugPanel.vue';
 import OutputPanel from './components/OutputPanel.vue';
