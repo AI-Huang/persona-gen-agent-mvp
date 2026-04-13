@@ -75,44 +75,13 @@ class ChatBot:
                 api_key=settings.OPENAI_API_KEY, base_url=settings.OPENAI_BASE_URL
             )
 
-            response = client.chat.completions.create(
-                model=params.model or self.model,
-                messages=final_messages,
-                temperature=params.temperature,
-                top_p=params.top_p,
-                n=params.n,
-                stream=params.stream,
-                stop=params.stop,
-                max_tokens=params.max_tokens,
-                frequency_penalty=params.frequency_penalty,
-                presence_penalty=params.presence_penalty,
-                logit_bias=params.logit_bias,
-                user=params.user,
-                response_format=params.response_format,
-                seed=params.seed,
-                tools=params.tools,
-                tool_choice=params.tool_choice,
-                parallel_tool_calls=params.parallel_tool_calls,
-                # 新增参数
-                audio=params.audio,
-                function_call=params.function_call,
-                functions=params.functions,
-                logprobs=params.logprobs,
-                max_completion_tokens=params.max_completion_tokens,
-                metadata=params.metadata,
-                modalities=params.modalities,
-                prediction=params.prediction,
-                prompt_cache_key=params.prompt_cache_key,
-                prompt_cache_retention=params.prompt_cache_retention,
-                reasoning_effort=params.reasoning_effort,
-                safety_identifier=params.safety_identifier,
-                service_tier=params.service_tier,
-                store=params.store,
-                stream_options=params.stream_options,
-                top_logprobs=params.top_logprobs,
-                verbosity=params.verbosity,
-                web_search_options=params.web_search_options,
-            )
+            # 构建参数，处理特殊情况
+            chat_params = params.model_dump()
+            chat_params["model"] = params.model or self.model
+            chat_params["messages"] = final_messages
+
+            # 调用 OpenAI API
+            response = client.chat.completions.create(**chat_params)
 
             # 获取模型响应
             model_response = response.choices[0].message.content
