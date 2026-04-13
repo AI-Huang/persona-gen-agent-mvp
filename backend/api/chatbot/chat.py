@@ -2,6 +2,8 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 
 from backend.agent.chatbot_agent import ChatBot
+from backend.database.db import ChatBot as ChatBotModel
+from backend.database.db import get_db
 
 router = APIRouter()
 
@@ -12,7 +14,13 @@ chatbot_instances = {}
 class ChatBotCreateInput(BaseModel):
     name: str
     system_prompt: str
-    model: str = "gpt-3.5-turbo"
+    model: str = "gpt-5"
+
+
+class ChatBotUpdateInput(BaseModel):
+    name: str
+    system_prompt: str
+    model: str
 
 
 class OpenAICompletionCreateParams(BaseModel):
@@ -238,6 +246,118 @@ class ChatBotInput(BaseModel):
     params: OpenAICompletionCreateParams
 
 
+@router.get(
+    "/list",
+    summary="获取 ChatBot 列表",
+    description="获取所有 ChatBot 实例",
+)
+async def get_chatbots():
+    try:
+        # 获取数据库会话
+        db_generator = get_db()
+        db = next(db_generator)
+        
+        # 查询所有 ChatBot
+        chatbots = db.query(ChatBotModel).all()
+        
+        # 转换为响应格式
+        chatbot_list = []
+        for chatbot in chatbots:
+            chatbot_list.append({
+                "id": chatbot.id,
+                "name": chatbot.name,
+                "systemPrompt": chatbot.system_prompt,
+                "model": chatbot.model
+            })
+        
+        return {
+            "code": 200,
+            "message": "获取成功",
+            "data": chatbot_list
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"获取 ChatBot 列表失败: {str(e)}")
+
+
+@router.put(
+    "/update/{chatbot_id}",
+    summary="更新 ChatBot",
+    description="更新指定 ChatBot 的信息",
+)
+async def update_chatbot(chatbot_id: str, input: ChatBotUpdateInput):
+    try:
+        # 获取数据库会话
+        db_generator = get_db()
+        db = next(db_generator)
+        
+        # 查询 ChatBot
+        chatbot = db.query(ChatBotModel).filter(ChatBotModel.id == chatbot_id).first()
+        if not chatbot:
+            raise HTTPException(status_code=404, detail=f"ChatBot {chatbot_id} 不存在")
+        
+        # 更新 ChatBot 信息
+        chatbot.name = input.name
+        chatbot.system_prompt = input.system_prompt
+        chatbot.model = input.model
+        
+        # 保存到数据库
+        db.commit()
+        db.refresh(chatbot)
+        
+        # 更新内存中的实例
+        if chatbot_id in chatbot_instances:
+            del chatbot_instances[chatbot_id]
+        
+        return {
+            "code": 200,
+            "message": "更新成功",
+            "data": {
+                "id": chatbot.id,
+                "name": chatbot.name,
+                "system_prompt": chatbot.system_prompt,
+                "model": chatbot.model
+            }
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"更新 ChatBot 失败: {str(e)}")
+
+
+@router.delete(
+    "/delete/{chatbot_id}",
+    summary="删除 ChatBot",
+    description="删除指定的 ChatBot 实例",
+)
+async def delete_chatbot(chatbot_id: str):
+    try:
+        # 获取数据库会话
+        db_generator = get_db()
+        db = next(db_generator)
+        
+        # 查询 ChatBot
+        chatbot = db.query(ChatBotModel).filter(ChatBotModel.id == chatbot_id).first()
+        if not chatbot:
+            raise HTTPException(status_code=404, detail=f"ChatBot {chatbot_id} 不存在")
+        
+        # 删除 ChatBot
+        db.delete(chatbot)
+        db.commit()
+        
+        # 从内存中删除实例
+        if chatbot_id in chatbot_instances:
+            del chatbot_instances[chatbot_id]
+        
+        return {
+            "code": 200,
+            "message": "删除成功"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"删除 ChatBot 失败: {str(e)}")
+
+
 @router.post(
     "/create",
     summary="创建 ChatBot",
@@ -288,4 +408,4 @@ async def chat_with_chatbot(input: ChatBotInput):
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"对话失败: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"对话失败: {str(e)}")        raise HTTPException(status_code=500, detail=f"对话失败: {str(e)}")

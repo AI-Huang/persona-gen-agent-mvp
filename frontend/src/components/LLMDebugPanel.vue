@@ -55,20 +55,12 @@
             <input type="range" v-model.number="topP" min="0" max="1" step="0.1">
           </div>
           <div class="param-item">
-            <label>max_tokens: {{ maxTokens }}</label>
-            <input type="number" v-model.number="maxTokens" min="1" max="4096" step="100">
-          </div>
-          <div class="param-item">
             <label>frequency_penalty: {{ frequencyPenalty }}</label>
             <input type="range" v-model.number="frequencyPenalty" min="-2" max="2" step="0.1">
           </div>
           <div class="param-item">
             <label>presence_penalty: {{ presencePenalty }}</label>
             <input type="range" v-model.number="presencePenalty" min="-2" max="2" step="0.1">
-          </div>
-          <div class="param-item">
-            <label>stop: {{ stop }}</label>
-            <input type="text" v-model="stop" placeholder="输入停止词，用逗号分隔">
           </div>
         </div>
       </div>
@@ -122,10 +114,8 @@ const systemPrompt = ref('');
 const userInput = ref('');
 const temperature = ref(0.7);
 const topP = ref(0.9);
-const maxTokens = ref(1000);
 const frequencyPenalty = ref(0);
 const presencePenalty = ref(0);
-const stop = ref('');
 const messages = ref([]);
 const loading = ref(false);
 const error = ref('');
@@ -137,9 +127,14 @@ const createChatBot = async () => {
     loading.value = true;
     error.value = '';
     
+    // 如果系统提示词为空，设置默认值
+    if (!systemPrompt.value) {
+      systemPrompt.value = '你是一个 helpful 的助手';
+    }
+    
     const response = await request('/api/chatbot/create', 'POST', {
       name: 'LLM 调试助手',
-      system_prompt: systemPrompt.value || '你是一个 helpful 的助手',
+      system_prompt: systemPrompt.value,
       model: selectedModel.value
     });
     
@@ -178,7 +173,7 @@ const sendRequest = async () => {
     
     // 构建 messages 数组
     const messagesArray = [
-      { role: 'system', content: systemPrompt.value || '你是一个 helpful 的助手' },
+      { role: 'system', content: systemPrompt.value },
       { role: 'user', content: userMessage }
     ];
     
@@ -190,10 +185,8 @@ const sendRequest = async () => {
         messages: messagesArray,
         temperature: temperature.value,
         top_p: topP.value,
-        max_tokens: maxTokens.value,
         frequency_penalty: frequencyPenalty.value,
-        presence_penalty: presencePenalty.value,
-        stop: stop.value ? stop.value.split(',').map(s => s.trim()) : null
+        presence_penalty: presencePenalty.value
       }
     };
     
@@ -236,10 +229,8 @@ const clearAll = () => {
   userInput.value = '';
   temperature.value = 0.7;
   topP.value = 0.9;
-  maxTokens.value = 1000;
   frequencyPenalty.value = 0;
   presencePenalty.value = 0;
-  stop.value = '';
   messages.value = [];
   chatbotId.value = '';
   error.value = '';

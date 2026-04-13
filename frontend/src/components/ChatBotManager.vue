@@ -86,34 +86,21 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import { request } from '../utils/request';
 
 const chatbots = ref([]);
 const newChatBot = ref({
   name: '',
   systemPrompt: '',
-  model: 'gpt-3.5-turbo'
+  model: 'gpt-5'
 });
 const editingChatBot = ref(null);
 
 // 加载 ChatBot 列表
 const loadChatBots = async () => {
   try {
-    // 这里需要实现与后端的交互，获取 ChatBot 列表
-    // 暂时模拟数据
-    chatbots.value = [
-      {
-        id: '1',
-        name: '测试机器人',
-        systemPrompt: '你是一个 helpful 的助手',
-        model: 'gpt-3.5-turbo'
-      },
-      {
-        id: '2',
-        name: '客服机器人',
-        systemPrompt: '你是一个专业的客服代表，负责回答用户的问题',
-        model: 'gpt-4'
-      }
-    ];
+    const response = await request('/api/chatbot/list', 'GET');
+    chatbots.value = response.data;
   } catch (error) {
     console.error('加载 ChatBot 列表失败:', error);
   }
@@ -122,21 +109,20 @@ const loadChatBots = async () => {
 // 创建 ChatBot
 const createChatBot = async () => {
   try {
-    // 这里需要实现与后端的交互，创建 ChatBot
-    // 暂时模拟创建
-    const newId = Date.now().toString();
-    chatbots.value.push({
-      id: newId,
+    const response = await request('/api/chatbot/create', 'POST', {
       name: newChatBot.value.name,
-      systemPrompt: newChatBot.value.systemPrompt,
+      system_prompt: newChatBot.value.systemPrompt,
       model: newChatBot.value.model
     });
+    
+    // 重新加载 ChatBot 列表
+    await loadChatBots();
     
     // 清空表单
     newChatBot.value = {
       name: '',
       systemPrompt: '',
-      model: 'gpt-3.5-turbo'
+      model: 'gpt-5'
     };
   } catch (error) {
     console.error('创建 ChatBot 失败:', error);
@@ -151,12 +137,15 @@ const editChatBot = (chatbot) => {
 // 更新 ChatBot
 const updateChatBot = async () => {
   try {
-    // 这里需要实现与后端的交互，更新 ChatBot
-    // 暂时模拟更新
-    const index = chatbots.value.findIndex(cb => cb.id === editingChatBot.value.id);
-    if (index !== -1) {
-      chatbots.value[index] = { ...editingChatBot.value };
-    }
+    await request(`/api/chatbot/update/${editingChatBot.value.id}`, 'PUT', {
+      name: editingChatBot.value.name,
+      system_prompt: editingChatBot.value.systemPrompt,
+      model: editingChatBot.value.model
+    });
+    
+    // 重新加载 ChatBot 列表
+    await loadChatBots();
+    
     editingChatBot.value = null;
   } catch (error) {
     console.error('更新 ChatBot 失败:', error);
@@ -167,9 +156,10 @@ const updateChatBot = async () => {
 const deleteChatBot = async (id) => {
   if (confirm('确定要删除这个 ChatBot 吗？')) {
     try {
-      // 这里需要实现与后端的交互，删除 ChatBot
-      // 暂时模拟删除
-      chatbots.value = chatbots.value.filter(cb => cb.id !== id);
+      await request(`/api/chatbot/delete/${id}`, 'DELETE');
+      
+      // 重新加载 ChatBot 列表
+      await loadChatBots();
     } catch (error) {
       console.error('删除 ChatBot 失败:', error);
     }
