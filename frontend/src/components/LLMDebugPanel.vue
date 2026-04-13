@@ -19,6 +19,15 @@
       <textarea v-model="systemPrompt" placeholder="输入系统提示词..."></textarea>
     </div>
     
+    <!-- ChatBot ID 显示 -->
+    <div v-if="chatbotId" class="form-group">
+      <label>ChatBot ID：</label>
+      <div class="chatbot-id">
+        {{ chatbotId }}
+        <button @click="copyChatbotId" class="copy-btn">复制</button>
+      </div>
+    </div>
+    
     <!-- 对话历史 -->
     <div class="form-group">
       <label>对话历史：</label>
@@ -174,6 +183,18 @@ const sendRequest = async () => {
   }
 };
 
+const copyChatbotId = () => {
+  if (chatbotId.value) {
+    navigator.clipboard.writeText(chatbotId.value)
+      .then(() => {
+        alert('ChatBot ID 已复制到剪贴板');
+      })
+      .catch(err => {
+        console.error('复制失败:', err);
+      });
+  }
+};
+
 const clearAll = () => {
   systemPrompt.value = '';
   userInput.value = '';
@@ -241,6 +262,34 @@ const clearAll = () => {
   border-radius: 4px;
   margin-bottom: 15px;
   font-size: 14px;
+}
+
+.chatbot-id {
+  display: flex;
+  align-items: center;
+  background-color: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 12px;
+  font-family: monospace;
+  font-size: 14px;
+  word-break: break-all;
+}
+
+.copy-btn {
+  margin-left: 10px;
+  padding: 4px 8px;
+  font-size: 12px;
+  background-color: #e0e0e0;
+  color: #333;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.copy-btn:hover {
+  background-color: #d0d0d0;
 }
 </style>
 
