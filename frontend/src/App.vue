@@ -3,74 +3,39 @@
     <nav class="navbar">
       <div class="navbar-brand">人格提示词与OpenAI参数生成工具</div>
       <div class="navbar-buttons">
-        <button 
-          class="nav-button" 
-          :class="{ active: activePanel === 'persona' }"
-          @click="switchPanel('persona')"
-        >
+        <router-link to="/persona" class="nav-link" active-class="active">
           人格提示词工具
-        </button>
-        <button 
-          class="nav-button" 
-          :class="{ active: activePanel === 'llm' }"
-          @click="switchPanel('llm')"
-        >
+        </router-link>
+        <router-link to="/llm" class="nav-link" active-class="active">
           LLM上手调试
-        </button>
-        <button 
-          class="nav-button" 
-          :class="{ active: activePanel === 'chatbot' }"
-          @click="switchPanel('chatbot')"
-        >
+        </router-link>
+        <router-link to="/chatbot" class="nav-link" active-class="active">
           ChatBot 管理
-        </button>
-        <button 
-          class="nav-button" 
-          :class="{ active: activePanel === 'session' }"
-          @click="switchPanel('session')"
-        >
+        </router-link>
+        <router-link to="/session" class="nav-link" active-class="active">
           会话管理
-        </button>
+        </router-link>
+        <router-link to="/apps" class="nav-link" active-class="active">
+          聊天应用
+        </router-link>
       </div>
     </nav>
     
-    <!-- 人格提示词工具面板 -->
-    <div v-if="activePanel === 'persona'">
-      <InputPanel @generate-result="handleGenerateResult" />
-      <OutputPanel :result="result" />
-    </div>
-    
-    <!-- LLM 上手调试面板 -->
-    <div v-else-if="activePanel === 'llm'">
-      <LLMDebugPanel />
-    </div>
-    
-    <!-- ChatBot 管理面板 -->
-    <div v-else-if="activePanel === 'chatbot'">
-      <ChatBotManager />
-    </div>
-    
-    <!-- 会话管理面板 -->
-    <div v-else-if="activePanel === 'session'">
-      <SessionManager />
+    <!-- 主内容区域 -->
+    <div class="main-content">
+      <router-view v-slot="{ Component }">
+        <transition name="fade" mode="out-in">
+          <component :is="Component" />
+        </transition>
+      </router-view>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-import ChatBotManager from './components/ChatBotManager.vue';
-import InputPanel from './components/InputPanel.vue';
-import LLMDebugPanel from './components/LLMDebugPanel.vue';
-import OutputPanel from './components/OutputPanel.vue';
-import SessionManager from './components/SessionManager.vue';
 
-const activePanel = ref('persona');
 const result = ref(null);
-
-const switchPanel = (panel) => {
-  activePanel.value = panel;
-};
 
 const handleGenerateResult = (data) => {
   result.value = data;

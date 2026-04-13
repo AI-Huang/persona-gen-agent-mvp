@@ -28,20 +28,33 @@
         <div class="api-example">{{ result.api_example }}</div>
         <button class="copy-button" @click="copyToClipboard(result.api_example)">一键复制</button>
       </div>
+      
+      <div class="button-group">
+        <router-link to="/persona" class="nav-link">返回人格提示词工具</router-link>
+      </div>
     </div>
     
     <div v-else class="output-section">
       <p>请选择模板或输入人格描述，点击生成按钮获取结果</p>
+      <div class="button-group">
+        <router-link to="/persona" class="nav-link">返回人格提示词工具</router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 
-const props = defineProps({
-  result: {
-    type: Object,
-    default: null
+const router = useRouter();
+const result = ref(null);
+
+onMounted(() => {
+  // 从 sessionStorage 中获取结果数据
+  const storedResult = sessionStorage.getItem('generationResult');
+  if (storedResult) {
+    result.value = JSON.parse(storedResult);
   }
 });
 

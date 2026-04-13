@@ -38,9 +38,10 @@
 
 <script setup>
 import { onMounted, ref } from 'vue';
+import { useRouter } from 'vue-router';
 import { request } from '../utils/request';
 
-const emit = defineEmits(['generate-result']);
+const router = useRouter();
 
 const templates = ref([]);
 const selectedTemplateId = ref('');
@@ -60,7 +61,9 @@ const generateByTemplate = async () => {
     scene: scene.value
   });
   if (res) {
-    emit('generate-result', res.data);
+    // 将结果存储在 sessionStorage 中，然后跳转到 output 页面
+    sessionStorage.setItem('generationResult', JSON.stringify(res.data));
+    router.push('/output');
   }
 };
 
@@ -70,7 +73,9 @@ const generateByNL = async () => {
     scene: scene.value
   });
   if (res) {
-    emit('generate-result', res.data);
+    // 将结果存储在 sessionStorage 中，然后跳转到 output 页面
+    sessionStorage.setItem('generationResult', JSON.stringify(res.data));
+    router.push('/output');
   }
 };
 </script>
