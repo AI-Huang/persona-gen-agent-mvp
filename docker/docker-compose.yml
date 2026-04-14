@@ -18,7 +18,7 @@ services:
   # 后端服务
   backend:
     build:
-      context: ./backend
+      context: ../backend
       dockerfile: Dockerfile
     container_name: persona-gen-agent-backend
     environment:
@@ -36,7 +36,7 @@ services:
   # 前端服务
   frontend:
     build:
-      context: ./frontend
+      context: ../frontend
       dockerfile: Dockerfile
     container_name: persona-gen-agent-frontend
     environment:
@@ -49,4 +49,3 @@ services:
 
 volumes:
   postgres_data:
-    
