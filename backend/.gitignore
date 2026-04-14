@@ -1,4 +1,25 @@
-docs/
+uv.lock
+
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+venv/
+env/
+env.local/
+
+# IDE/Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
 
 # OS files
 .DS_Store
@@ -10,6 +31,11 @@ Thumbs.db
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Testing
+.pytest_cache/
+.coverage
+coverage.xml
 
 # Documentation
 .sphinx/
