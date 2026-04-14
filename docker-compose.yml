@@ -4,7 +4,7 @@ services:
   # 数据库服务
   db:
     image: postgres:14
-    container_name: persona-agent-db
+    container_name: persona-gen-agent-db
     environment:
       POSTGRES_DB: persona_agent
       POSTGRES_USER: admin
@@ -20,7 +20,7 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
-    container_name: persona-agent-backend
+    container_name: persona-gen-agent-backend
     environment:
       - HOST=0.0.0.0
       - PORT=8000
@@ -38,7 +38,7 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
-    container_name: persona-agent-frontend
+    container_name: persona-gen-agent-frontend
     environment:
       - VITE_API_URL=http://localhost:8000/api
     ports:
@@ -49,3 +49,4 @@ services:
 
 volumes:
   postgres_data:
+    

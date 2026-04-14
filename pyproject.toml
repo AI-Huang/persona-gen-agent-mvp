@@ -1,7 +1,7 @@
 [project]
-name = "persona-agent-mvp"
+name = "persona-gen-agent-mvp"
 version = "0.1.0"
-description = "人格提示词与OpenAI参数生成AI Agent"
+description = "人格提示词生成与OpenAI参数生成AI Agent"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
