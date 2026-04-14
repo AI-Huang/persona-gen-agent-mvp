@@ -28,8 +28,7 @@ RUN apk update && apk add --no-cache nginx
 # 复制构建结果到 nginx 静态目录
 COPY --from=0 /app/dist /usr/share/nginx/html
 
-# 暴露端口（使用环境变量，默认为 80）
-ENV PORT=80
+# 暴露端口（使用环境变量）
 EXPOSE ${PORT}
 
 # 启动 nginx
